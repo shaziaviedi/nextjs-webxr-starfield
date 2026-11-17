@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js React Three Fiber Tutorial",
-  description: "Learn 3D web development with React Three Fiber and Next.js",
+  title: "StarField",
+  description: "An interactive particle field with desktop exploration and WebXR support.",
 };
 
 export default function RootLayout({

@@ -1,13 +1,13 @@
 // only handles the look + spin. position is set by FieldMotionProvider
 
-import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
 import * as THREE from 'three';
-import { CelestialBodyConfig } from '../../../types/field';
+import type { CelestialBodyConfig } from '../../../types/field';
 import { useFieldBody } from '../FieldMotionProvider';
-import { GlowingCore } from './GlowingCore';
 import { BodyShell } from './BodyShell';
 import { FaintRing } from './FaintRing';
+import { GlowingCore } from './GlowingCore';
 import { ParticleCluster } from './ParticleCluster';
 
 export function CelestialBody({

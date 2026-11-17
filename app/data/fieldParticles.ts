@@ -1,14 +1,15 @@
 // sizes are in metres so far groups need bigger particles.
-// if the headset lags, lower the counts first
+// count is the high-preset buffer capacity; referenceCount preserves the original artwork.
 
-import { AmbientDustConfig, FieldStreamConfig } from '../types/field';
+import type { AmbientDustConfig, FieldStreamConfig } from '../types/field';
 import { PALETTE } from './palette';
 
 export const DUST_VOLUMES: AmbientDustConfig[] = [
   {
     // inner radius keeps it out of the visitors face
     id: 'near-dust',
-    count: 1400,
+    count: 2450,
+    referenceCount: 1400,
     center: [0, 1.6, 0],
     innerRadius: 1.2,
     outerRadius: 14,
@@ -26,7 +27,8 @@ export const DUST_VOLUMES: AmbientDustConfig[] = [
   },
   {
     id: 'deep-dust',
-    count: 2600,
+    count: 4550,
+    referenceCount: 2600,
     center: [0, 2, -4],
     innerRadius: 8,
     outerRadius: 46,
@@ -49,7 +51,8 @@ export const FIELD_STREAMS: FieldStreamConfig[] = [
   {
     // overhead
     id: 'great-arc',
-    count: 1600,
+    count: 4800,
+    referenceCount: 1600,
     center: [0, 9, -4],
     radii: [22, 16],
     tilt: [0.25, 0, 0.1],
@@ -70,7 +73,8 @@ export const FIELD_STREAMS: FieldStreamConfig[] = [
   {
     // under the floor
     id: 'undercurrent',
-    count: 1200,
+    count: 3600,
+    referenceCount: 1200,
     center: [3, -5, 0],
     radii: [18, 14],
     tilt: [-0.15, 0.6, 0.2],
@@ -93,7 +97,8 @@ export const FIELD_STREAMS: FieldStreamConfig[] = [
   {
     // eye height, between lantern pair and violet cloud
     id: 'crossing',
-    count: 1300,
+    count: 3900,
+    referenceCount: 1300,
     center: [0, 2.5, -6],
     radii: [14, 4],
     tilt: [0.1, 0, 0.25],
@@ -116,7 +121,8 @@ export const FIELD_STREAMS: FieldStreamConfig[] = [
   {
     // way wider than the mass so it reads as the field bending, not an orbit
     id: 'mass-wake',
-    count: 900,
+    count: 2700,
+    referenceCount: 900,
     center: [0, 3, -13],
     radii: [9, 6],
     tilt: [0.9, 0.3, -0.2],
@@ -137,7 +143,8 @@ export const FIELD_STREAMS: FieldStreamConfig[] = [
   {
     // almost vertical, left side
     id: 'standing-loop',
-    count: 900,
+    count: 2700,
+    referenceCount: 900,
     center: [-6, 2, 0],
     radii: [7, 9],
     tilt: [0, 0, 1.4],
@@ -157,7 +164,8 @@ export const FIELD_STREAMS: FieldStreamConfig[] = [
   },
   {
     id: 'rear-current',
-    count: 1000,
+    count: 3000,
+    referenceCount: 1000,
     center: [2, 1.5, 6],
     radii: [10, 7],
     tilt: [0.5, -0.4, 0.3],
@@ -179,7 +187,8 @@ export const FIELD_STREAMS: FieldStreamConfig[] = [
   },
   {
     id: 'far-current',
-    count: 1200,
+    count: 3600,
+    referenceCount: 1200,
     center: [-12, 6, -20],
     radii: [26, 12],
     tilt: [0.3, 0.5, 0],

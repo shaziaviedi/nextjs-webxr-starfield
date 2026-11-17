@@ -120,6 +120,8 @@ export type CelestialBodyConfig = MotionNode & {
 // particle field
 
 export type FieldParticleLook = {
+  // keep these original seeded particles when adding density
+  referenceCount?: number;
   colors: string[];
   accentColor?: string;
   accentChance?: number; // 0.03 = 3%
@@ -156,5 +158,5 @@ export type FieldStreamConfig = FieldParticleLook & {
 };
 
 // passed as one object so useMemo doesnt rebuild every render
-export type AmbientDustProps = { config: AmbientDustConfig };
-export type FieldStreamProps = { config: FieldStreamConfig };
+export type AmbientDustProps = { config: AmbientDustConfig; visibleCount?: number };
+export type FieldStreamProps = { config: FieldStreamConfig; visibleCount?: number };

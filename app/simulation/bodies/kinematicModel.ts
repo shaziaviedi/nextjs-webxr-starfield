@@ -2,7 +2,7 @@
 // follows FieldMotionModel so a proper gravity sim can replace it later
 
 import * as THREE from 'three';
-import { BinaryPairConfig, FieldMotionModel, MotionNode, OrbitMotion } from '../types/field';
+import type { BinaryPairConfig, FieldMotionModel, MotionNode, OrbitMotion } from '../../types/field';
 
 const TWO_PI = Math.PI * 2;
 

@@ -1,5 +1,4 @@
 // particle movement is done here on the gpu, way cheaper than js for this many
-import { MAX_INTERACTION_SOURCES } from '../../../types/interaction';
 
 const vertexHeader = /* glsl */ `
   uniform float uTime;
@@ -16,21 +15,27 @@ const vertexHeader = /* glsl */ `
   varying float vAlpha;
 
   uniform int uInteractionCount;
-  uniform vec4 uInteractionSources[${MAX_INTERACTION_SOURCES}]; // world xyz + radius
-  uniform float uInteractionStrengths[${MAX_INTERACTION_SOURCES}];
+  uniform sampler2D uInteractionTexture;
+  uniform vec2 uInteractionTextureSize;
   uniform float uMaxDisplacement;
+
+  vec4 interactionTexel(float index) {
+    vec2 pixel = vec2(mod(index, uInteractionTextureSize.x), floor(index / uInteractionTextureSize.x));
+    return texture2D(uInteractionTexture, (pixel + 0.5) / uInteractionTextureSize);
+  }
 
   // Approximate spring response: source envelopes ease in/recover on the CPU,
   // while every vertex keeps following its original analytic animated path.
   // No position accumulation, per-particle CPU work, or renderer-specific compute.
   vec3 interactionOffset(vec3 worldPosition) {
     vec3 displacement = vec3(0.0);
-    for (int i = 0; i < ${MAX_INTERACTION_SOURCES}; i++) {
-      if (i >= uInteractionCount) break;
-      float strength = uInteractionStrengths[i];
+    for (int i = 0; i < uInteractionCount; i++) {
+      float texel = float(i) * 2.0;
+      float strength = interactionTexel(texel + 1.0).x;
       if (strength <= 0.0) continue;
-      vec3 away = worldPosition - uInteractionSources[i].xyz;
-      float radius = max(uInteractionSources[i].w, 0.0001);
+      vec4 source = interactionTexel(texel);
+      vec3 away = worldPosition - source.xyz;
+      float radius = max(source.w, 0.0001);
       float distanceSquared = dot(away, away);
       if (distanceSquared >= radius * radius) continue;
       float distanceToSource = sqrt(distanceSquared);

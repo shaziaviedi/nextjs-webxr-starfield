@@ -1,7 +1,7 @@
-import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
 import * as THREE from 'three';
-import { CoreConfig } from '../../../types/field';
+import type { CoreConfig } from '../../../types/field';
 
 // basic material ignores lights so the core stays bright in the dark
 export function GlowingCore({

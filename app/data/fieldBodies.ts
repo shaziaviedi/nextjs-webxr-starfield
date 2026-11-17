@@ -1,8 +1,8 @@
 // visitor at origin, eyes ~1.6m. -z is in front. metres + radians
 // period = secs per loop so bigger is slower
 
-import { CelestialBodyConfig, MotionNode } from '../types/field';
-import { createBinaryOrbits } from '../simulation/kinematicModel';
+import { createBinaryOrbits } from '../simulation/bodies/kinematicModel';
+import type { CelestialBodyConfig, MotionNode } from '../types/field';
 import { PALETTE } from './palette';
 
 const QUARTER_TURN = Math.PI / 2;
@@ -40,7 +40,7 @@ const [CAGE_ORBIT, SHARD_ORBIT] = createBinaryOrbits({
   massA: CAGE_MASS,
   massB: SHARD_MASS,
   separation: 3.2,
-    period: -140, // opposite way to lantern pair
+  period: -140, // opposite way to lantern pair
   tilt: [0.2, 0, -0.35],
   phase: 1,
 });

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ShellConfig } from '../../../types/field';
+import type { ShellConfig } from '../../../types/field';
 
 export function BodyShell({
   geometry,

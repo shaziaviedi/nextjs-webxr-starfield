@@ -1,10 +1,12 @@
-import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
+import { test } from 'node:test';
 import { createInteractionStore } from '../app/simulation/interactionStore';
-import { InteractionSource, MAX_INTERACTION_SOURCES } from '../app/types/interaction';
+import { InteractionSource } from '../app/types/interaction';
 
 const source = (id = 'test'): InteractionSource => ({ id, position: [0, 2.5, -2], radius: 3, strength: 2, active: true });
-const strength = (store: ReturnType<typeof createInteractionStore>, index = 0) => store.uniforms.uInteractionStrengths.value[index];
+const data = (store: ReturnType<typeof createInteractionStore>) => store.uniforms.uInteractionTexture.value.image.data as Float32Array;
+const strength = (store: ReturnType<typeof createInteractionStore>, index = 0) => data(store)[index * 8 + 4];
+const position = (store: ReturnType<typeof createInteractionStore>, index = 0) => Array.from(data(store).slice(index * 8, index * 8 + 4));
 
 test('activation and recovery agree across 30, 60, and 120 Hz', () => {
   const results = [30, 60, 120].map((fps) => {
@@ -31,7 +33,7 @@ test('removal retains the last position and decays before freeing its slot', () 
   assert.equal(strength(store), before);
   store.step(1 / 60);
   assert.ok(strength(store) > 0 && strength(store) < before);
-  assert.deepEqual(store.uniforms.uInteractionSources.value[0].toArray(), [0, 2.5, -2, 3]);
+  assert.deepEqual(position(store), [0, 2.5, -2, 3]);
   store.step(10);
   assert.equal(strength(store), 0);
   assert.equal(store.uniforms.uInteractionCount.value, 0);
@@ -50,7 +52,7 @@ test('multiple sources remain independent and recovering slots are not overwritt
   assert.ok(strength(store, 0) > 0);
   assert.ok(strength(store, 1) >= second);
   assert.ok(strength(store, 2) > 0);
-  assert.equal(store.uniforms.uInteractionSources.value[1].x, 10);
+  assert.equal(position(store, 1)[0], 10);
 });
 
 test('source changes ease continuously and caller-owned positions are copied', () => {
@@ -59,13 +61,13 @@ test('source changes ease continuously and caller-owned positions are copied', (
   store.upsert(input);
   input.position[0] = 999;
   store.step(1);
-  assert.equal(store.uniforms.uInteractionSources.value[0].x, 0);
+  assert.equal(position(store)[0], 0);
   store.upsert({ ...source(), position: [10, 2.5, -2], radius: 6 });
-  assert.equal(store.uniforms.uInteractionSources.value[0].x, 0);
+  assert.equal(position(store)[0], 0);
   store.step(1 / 60);
-  assert.ok(store.uniforms.uInteractionSources.value[0].x > 0);
-  assert.ok(store.uniforms.uInteractionSources.value[0].x < 10);
-  assert.ok(store.uniforms.uInteractionSources.value[0].w < 6);
+  assert.ok(position(store)[0] > 0);
+  assert.ok(position(store)[0] < 10);
+  assert.ok(position(store)[3] < 6);
 });
 
 test('invalid inputs and shader overflow are rejected; bad frame deltas are ignored', () => {
@@ -83,11 +85,17 @@ test('invalid inputs and shader overflow are rejected; bad frame deltas are igno
   assert.equal(strength(store), 2);
 });
 
-test('capacity is explicit and released slots can be reused', () => {
+test('source storage grows beyond eight, preserves existing data, and reuses released slots', () => {
   const store = createInteractionStore();
-  for (let i = 0; i < MAX_INTERACTION_SOURCES; i++) store.upsert(source(String(i)));
+  store.upsert(source('0'));
   store.step(1);
-  assert.throws(() => store.upsert(source('overflow')), RangeError);
+  const firstStrength = strength(store);
+  for (let i = 1; i < 70; i++) store.upsert({ ...source(String(i)), position: [i, 0, 0] });
+  assert.equal(strength(store), firstStrength);
+  assert.equal(position(store, 69)[0], 69);
+  store.step(1);
+  assert.equal(store.uniforms.uInteractionCount.value, 70);
+  assert.ok(strength(store, 69) > 0);
   store.clear();
   store.step(10);
   assert.equal(store.uniforms.uInteractionCount.value, 0);

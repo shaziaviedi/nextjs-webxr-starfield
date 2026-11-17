@@ -1,7 +1,7 @@
-import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { ParticleClusterConfig } from '../../../types/field';
+import type { ParticleClusterConfig } from '../../../types/field';
 import { createSeededRandom } from '../../../utils/random';
 
 // points render as squares by default, this soft dot texture fixes that. made once and shared

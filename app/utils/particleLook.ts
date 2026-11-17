@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { FieldParticleLook } from '../types/field';
+import type { FieldParticleLook } from '../types/field';
 
 export function createParticleLook(look: FieldParticleLook, count: number, random: () => number) {
   const sizes = new Float32Array(count);

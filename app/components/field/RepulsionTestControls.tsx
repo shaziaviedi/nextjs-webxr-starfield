@@ -5,7 +5,7 @@ import { interactionStore } from '../../simulation/interactionStore';
 
 const SOURCE_ID = 'repulsion-test';
 
-/** Temporary opt-in test harness. Normal visits have no source or extra scene geometry. */
+// opt-in test panel; normal visits add no test source or geometry
 export function RepulsionTestControls() {
   const [visible, setVisible] = useState(false);
   const [active, setActive] = useState(false);

@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { useMemo } from 'react';
 import * as THREE from 'three';
 import { interactionStore } from '../../../simulation/interactionStore';
 

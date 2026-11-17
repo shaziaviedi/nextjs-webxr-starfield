@@ -3,36 +3,14 @@
 
 import { useMemo } from 'react';
 import * as THREE from 'three';
-import { FieldStreamProps } from '../../../types/field';
-import { createSeededRandom } from '../../../utils/random';
-import { createParticleLook } from '../../../utils/particleLook';
+import type { FieldStreamProps } from '../../../types/field';
+import { createStreamParticles } from '../../../utils/fieldParticles';
 import { particleFragmentShader, streamVertexShader } from './shaders';
 import { useFieldParticleUniforms } from './useFieldParticleUniforms';
 
-export function FieldStream({ config }: FieldStreamProps) {
-  const { count, center, radii, tilt, spread, flatness, period, waveAmplitude, waveFrequency, clumping, opacity, seed } =
-    config;
-
-  const particles = useMemo(() => {
-    const random = createSeededRandom(seed);
-    const progress = new Float32Array(count);
-    const offsets = new Float32Array(count * 3);
-
-    // rough bell curve so the stream is thicker in the middle
-    const bell = () => (random() + random() + random() - 1.5) / 1.5;
-
-    for (let i = 0; i < count; i++) {
-      progress[i] = random();
-      offsets[i * 3] = bell() * spread;
-      offsets[i * 3 + 1] = bell() * spread * flatness;
-      offsets[i * 3 + 2] = bell() * spread;
-    }
-
-    // three still wants a position attribute, shader ignores it
-    const positions = new Float32Array(count * 3);
-
-    return { positions, progress, offsets, ...createParticleLook(config, count, random) };
-  }, [config, count, spread, flatness, seed]);
+export function FieldStream({ config, visibleCount = config.count }: FieldStreamProps) {
+  const { center, radii, tilt, period, waveAmplitude, waveFrequency, clumping, opacity } = config;
+  const particles = useMemo(() => createStreamParticles(config), [config]);
 
   const extraUniforms = useMemo(() => {
     const rotation = new THREE.Matrix3().setFromMatrix4(
@@ -53,7 +31,7 @@ export function FieldStream({ config }: FieldStreamProps) {
 
   return (
     <points frustumCulled={false}>
-      <bufferGeometry>
+      <bufferGeometry drawRange={{ start: 0, count: visibleCount }}>
         <bufferAttribute attach="attributes-position" args={[particles.positions, 3]} />
         <bufferAttribute attach="attributes-aProgress" args={[particles.progress, 1]} />
         <bufferAttribute attach="attributes-aOffset" args={[particles.offsets, 3]} />

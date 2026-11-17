@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { RingConfig } from '../../../types/field';
+import type { RingConfig } from '../../../types/field';
 
 export function FaintRing({ innerRadius, outerRadius, color, opacity, tilt }: RingConfig) {
   return (
