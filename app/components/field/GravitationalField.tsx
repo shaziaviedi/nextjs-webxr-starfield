@@ -3,10 +3,12 @@
 import { DUST_VOLUMES, FIELD_STREAMS } from '../../data/fieldParticles';
 import { AmbientDust } from './particles/AmbientDust';
 import { FieldStream } from './particles/FieldStream';
+import { InteractionRuntime } from './InteractionRuntime';
 
 export function GravitationalField() {
   return (
     <group>
+      <InteractionRuntime />
       {DUST_VOLUMES.map((dust) => (
         <AmbientDust key={dust.id} config={dust} />
       ))}

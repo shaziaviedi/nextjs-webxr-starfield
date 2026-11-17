@@ -1,4 +1,5 @@
 // particle movement is done here on the gpu, way cheaper than js for this many
+import { MAX_INTERACTION_SOURCES } from '../../../types/interaction';
 
 const vertexHeader = /* glsl */ `
   uniform float uTime;
@@ -13,11 +14,41 @@ const vertexHeader = /* glsl */ `
 
   varying vec3 vColor;
   varying float vAlpha;
+
+  uniform int uInteractionCount;
+  uniform vec4 uInteractionSources[${MAX_INTERACTION_SOURCES}]; // world xyz + radius
+  uniform float uInteractionStrengths[${MAX_INTERACTION_SOURCES}];
+  uniform float uMaxDisplacement;
+
+  // Approximate spring response: source envelopes ease in/recover on the CPU,
+  // while every vertex keeps following its original analytic animated path.
+  // No position accumulation, per-particle CPU work, or renderer-specific compute.
+  vec3 interactionOffset(vec3 worldPosition) {
+    vec3 displacement = vec3(0.0);
+    for (int i = 0; i < ${MAX_INTERACTION_SOURCES}; i++) {
+      if (i >= uInteractionCount) break;
+      float strength = uInteractionStrengths[i];
+      if (strength <= 0.0) continue;
+      vec3 away = worldPosition - uInteractionSources[i].xyz;
+      float radius = max(uInteractionSources[i].w, 0.0001);
+      float distanceSquared = dot(away, away);
+      if (distanceSquared >= radius * radius) continue;
+      float distanceToSource = sqrt(distanceSquared);
+      float falloff = 1.0 - smoothstep(0.0, radius, distanceToSource);
+      // A regularized direction stays finite and continuous at the exact centre.
+      vec3 direction = away / sqrt(distanceSquared + 0.0001);
+      displacement += direction * strength * falloff;
+    }
+    float magnitude = length(displacement);
+    return displacement * min(1.0, uMaxDisplacement / max(magnitude, 0.0001));
+  }
 `;
 
 // shared end of both vertex shaders, needs "p" and "brightness" set
 const vertexFinish = /* glsl */ `
-  vec4 viewPosition = modelViewMatrix * vec4(p, 1.0);
+  vec4 worldPosition = modelMatrix * vec4(p, 1.0);
+  worldPosition.xyz += interactionOffset(worldPosition.xyz);
+  vec4 viewPosition = viewMatrix * worldPosition;
   gl_Position = projectionMatrix * viewPosition;
 
   float distanceToCamera = max(-viewPosition.z, 0.1);

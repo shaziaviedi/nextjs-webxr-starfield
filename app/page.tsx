@@ -5,6 +5,7 @@ import { OrbitControls } from "@react-three/drei";
 import { XR, createXRStore, XROrigin } from "@react-three/xr";
 import { FieldSystem } from "./components/field/FieldSystem";
 import { GravitationalField } from "./components/field/GravitationalField";
+import { RepulsionTestControls } from "./components/field/RepulsionTestControls";
 
 const store = createXRStore();
 
@@ -32,6 +33,7 @@ export default function Home() {
           <OrbitControls target={[0, 1.6, 0]} enablePan={true} enableZoom={true} enableRotate={true} />
         </XR>
       </Canvas>
+      <RepulsionTestControls />
     </div>
   );
 }

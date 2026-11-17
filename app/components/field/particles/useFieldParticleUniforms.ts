@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { interactionStore } from '../../../simulation/interactionStore';
 
 const drawingBufferSize = new THREE.Vector2();
 
@@ -15,6 +16,7 @@ export function useFieldParticleUniforms(opacity: number, extraUniforms: Record<
       uFadeStart: { value: 16 },
       uFadeEnd: { value: 50 },
       uMaxPointSize: { value: 40 },
+      ...interactionStore.uniforms,
       ...extraUniforms,
     }),
     [opacity, extraUniforms],
